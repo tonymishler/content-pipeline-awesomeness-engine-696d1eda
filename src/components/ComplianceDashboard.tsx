@@ -2,15 +2,27 @@
 import React, { useState, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { AlertTriangle, Check, Info } from "lucide-react";
 
-// Demo compliance alerts (would come from API in real)
+// Zoetis preset marketing copy to be analyzed
+const PRESET_COPY = `
+Zoetis UltraGuard™ offers instant results with guaranteed protection for all animals.
+Our revolutionary solution is proven to be the best treatment for pet care.
+Safe for all animals—veterinarian recommended.
+Choose Zoetis UltraGuard™ for unparalleled peace of mind.
+`;
+
+// Demo compliance alerts mapped to known phrases in preset copy
 const ISSUES = [
   {
-    phrase: "guaranteed results",
+    phrase: "guaranteed protection",
     type: "legal",
-    message: "Avoid making guarantees; compliance risk.",
+    message: "Avoid guarantees; compliance risk.",
+  },
+  {
+    phrase: "instant results",
+    type: "legal",
+    message: "Timing claims require evidence.",
   },
   {
     phrase: "best treatment",
@@ -28,14 +40,9 @@ const ISSUES = [
     message: "Unsubstantiated claims can be problematic.",
   },
   {
-    phrase: "safe for all animals",
+    phrase: "Safe for all animals",
     type: "legal",
     message: "Do not claim universal safety without data.",
-  },
-  {
-    phrase: "instant results",
-    type: "legal",
-    message: "Timing claims require evidence.",
   },
 ];
 
@@ -44,16 +51,15 @@ const WAIT_MESSAGES = [
   "Checking for snags in your copy…",
   "Hang tight, almost done!",
   "Running compliance checks…",
-  "Reviewing for clarity and compliance…"
+  "Reviewing for clarity and compliance…",
 ];
 
 function getRandomWaitMessage() {
   return WAIT_MESSAGES[Math.floor(Math.random() * WAIT_MESSAGES.length)];
 }
 
-// Randomly inject highlights for demo
+// Find phrases in preset copy and highlight them
 function annotateCopy(text: string) {
-  // For demo, find all issue phrases (case-insensitive) in the text
   let out: React.ReactNode[] = [];
   let working = text;
   let idx = 0;
@@ -75,29 +81,29 @@ function annotateCopy(text: string) {
       if (found.i > 0) {
         out.push(working.substr(0, found.i));
       }
-      // Highlighted span with tooltip
+      // Adjust highlight colors for Zoetis orange, yellow, blue
       out.push(
         <span
           key={idx}
-          className={`inline-flex items-center group relative px-1 rounded cursor-pointer transition
+          className={`inline-flex items-center group relative px-1 rounded font-semibold cursor-pointer transition
             ${
               found.issue.type === "legal"
-                ? "bg-red-100 text-red-700 hover:bg-red-200"
+                ? "bg-[#ffe8d4] text-[#ff671b] hover:bg-[#ffc099]"
                 : found.issue.type === "clarity"
-                ? "bg-yellow-100 text-yellow-700 hover:bg-yellow-200"
+                ? "bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
                 : "bg-blue-100 text-blue-700 hover:bg-blue-200"
             }
           `}
         >
           {found.phrase}
           <span className="absolute left-1/2 -translate-x-1/2 top-full mt-2 pointer-events-none z-10 opacity-0 group-hover:opacity-100 transition
-           bg-white border border-gray-200 text-gray-900 text-xs rounded px-3 py-1 shadow w-48 text-center animate-fade-in
+           bg-white border border-gray-200 text-gray-900 text-xs rounded px-3 py-1 shadow w-56 text-center animate-fade-in
            ">
             {found.issue.type === "legal" && (
-              <AlertTriangle className="inline w-3 h-3 text-red-500 mr-1" />
+              <AlertTriangle className="inline w-3 h-3 text-[#ff671b] mr-1" />
             )}
             {found.issue.type === "clarity" && (
-              <Info className="inline w-3 h-3 text-yellow-500 mr-1" />
+              <Info className="inline w-3 h-3 text-yellow-700 mr-1" />
             )}
             <b className="capitalize">{found.issue.type}:</b> {found.issue.message}
           </span>
@@ -114,82 +120,84 @@ function annotateCopy(text: string) {
 }
 
 export function ComplianceDashboard() {
-  const [text, setText] = useState("");
   const [step, setStep] = useState<"input" | "loading" | "result">("input");
   const [waitMsg, setWaitMsg] = useState(WAIT_MESSAGES[0]);
   const [result, setResult] = useState<React.ReactNode[] | null>(null);
   const timeoutRef = useRef<number | null>(null);
 
-  // Simulate compliance check with wait effect
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!text.trim()) return;
+  function handleRunCheck() {
     setWaitMsg(getRandomWaitMessage());
     setStep("loading");
-    // Simulate checking
+    // Simulate compliance check
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
     timeoutRef.current = window.setTimeout(() => {
-      setResult(annotateCopy(text));
+      setResult(annotateCopy(PRESET_COPY.trim()));
       setStep("result");
-    }, 2200 + Math.random() * 800); // 2.2-3s random delay
+    }, 1800 + Math.random() * 700); // 1.8-2.5s
   }
 
   function handleReset() {
-    setText("");
     setResult(null);
     setStep("input");
   }
 
-  // Check if there are any issues
-  const foundIssues = text
-    ? ISSUES.filter((i) =>
-        text.toLowerCase().includes(i.phrase.toLowerCase())
-      )
-    : [];
+  // Find which issues are present
+  const foundIssues = ISSUES.filter((i) =>
+    PRESET_COPY.toLowerCase().includes(i.phrase.toLowerCase())
+  );
 
   return (
-    <div className="min-h-screen bg-gradient-to-tr from-purple-100 to-blue-50 flex flex-col items-center justify-center py-12 w-full animate-fade-in">
-      <Card className="w-full max-w-xl shadow-xl border-0 rounded-2xl animate-scale-in p-2 bg-white/90">
+    <div
+      className="min-h-screen bg-white flex flex-col items-center justify-center py-12 w-full animate-fade-in"
+      style={{ fontFamily: "Montserrat, Arial, Helvetica, sans-serif" }}
+    >
+      <Card className="w-full max-w-2xl shadow-2xl border-0 rounded-2xl animate-scale-in p-2 bg-white">
         <CardHeader>
           <CardTitle className="flex flex-col items-center gap-2">
-            <span className="text-3xl font-extrabold text-purple-800">Compliance Check</span>
-            <span className="text-sm text-gray-600">
-              Paste your draft below and see compliance highlights instantly.
+            <span
+              className="text-[2.2rem] font-extrabold"
+              style={{ color: "#ff671b", letterSpacing: 0.5 }}
+            >
+              Compliance POC Demo
+            </span>
+            <span className="text-base text-gray-600">
+              Sample Zoetis copy, highlighting flagged compliance risks.
             </span>
           </CardTitle>
         </CardHeader>
         <CardContent>
           {step === "input" && (
-            <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-              <Textarea
-                className="min-h-[120px] text-lg bg-gray-50 focus:bg-white transition"
-                value={text}
-                onChange={(e) => setText(e.target.value)}
-                placeholder="Paste or write your copy here..."
-                required
-                maxLength={1800}
-                autoFocus
-              />
+            <div className="flex flex-col gap-5 items-center">
+              <div className="bg-[#ffe8d4] p-4 rounded-lg font-semibold text-[#ff671b] text-center text-lg max-w-prose shadow">
+                <span>
+                  <b>Demo Copy:</b>
+                  <br />
+                  <span className="whitespace-pre-wrap block mt-1 text-gray-700 font-medium text-base" style={{ color: "#403E43" }}>
+                    {PRESET_COPY}
+                  </span>
+                </span>
+              </div>
               <Button
-                type="submit"
+                type="button"
                 size="lg"
-                className="w-full bg-purple-600 text-white rounded-md hover:bg-purple-700 transition ease-in-out"
-                disabled={!text.trim()}
+                className="w-full max-w-xs bg-[#ff671b] text-white rounded-md text-base hover:bg-[#da5900] transition"
+                onClick={handleRunCheck}
               >
                 Run Compliance Check
               </Button>
               <div className="flex flex-col gap-1 text-xs text-gray-400 pt-2">
                 <span>
-                  Demo: Issues will be highlighted—hover for compliance tips.
+                  Issues are highlighted below after running the check—hover for compliance tips.
                 </span>
               </div>
-            </form>
+            </div>
           )}
 
           {step === "loading" && (
             <div className="flex flex-col items-center justify-center min-h-[180px] py-10 animate-fade-in">
               <svg
-                className="animate-spin mb-4 text-purple-600"
+                className="animate-spin mb-4"
+                style={{ color: "#ff671b" }}
                 width="40"
                 height="40"
                 viewBox="0 0 50 50"
@@ -202,32 +210,33 @@ export function ComplianceDashboard() {
                   stroke="currentColor"
                   strokeWidth="5"
                   fill="none"
-                  opacity="0.25"
+                  opacity="0.22"
                 />
                 <path
                   d="M45 25c0-11.046-8.954-20-20-20"
                   stroke="currentColor"
                   strokeWidth="5"
                   strokeLinecap="round"
-                  className="opacity-70"
+                  className="opacity-80"
                 />
               </svg>
-              <span className="text-purple-700 font-medium text-lg">{waitMsg}</span>
+              <span className="font-semibold text-[#ff671b] text-lg">{waitMsg}</span>
             </div>
           )}
 
           {step === "result" && (
-            <div className="animate-fade-in flex flex-col gap-3">
-              <div className="bg-blue-50 border-l-4 border-blue-300 rounded px-4 py-2 text-sm mb-2">
-                <b>Done! Compliance Check Complete.</b>
+            <div className="animate-fade-in flex flex-col gap-4">
+              <div className="bg-[#ffe8d4] border-l-4 border-[#ff671b] rounded px-4 py-2 text-sm mb-2">
+                <b className="text-[#ff671b]">Compliance Check Complete.</b>
                 <br />
                 {foundIssues.length === 0 ? (
                   <span className="flex items-center gap-1 text-green-700 mt-1">
                     <Check className="inline h-4 w-4" /> No compliance flags found!
                   </span>
                 ) : (
-                  <span className="flex items-center gap-1 text-red-700 mt-1">
-                    <AlertTriangle className="inline h-4 w-4" /> {foundIssues.length} issue{foundIssues.length > 1 && "s"} flagged
+                  <span className="flex items-center gap-1 text-[#ff671b] mt-1">
+                    <AlertTriangle className="inline h-4 w-4" /> {foundIssues.length} issue
+                    {foundIssues.length > 1 && "s"} flagged
                   </span>
                 )}
               </div>
@@ -237,23 +246,35 @@ export function ComplianceDashboard() {
               <Button
                 onClick={handleReset}
                 variant="outline"
-                className="w-full mt-4"
+                className="w-full mt-4 border-[#ff671b] text-[#ff671b] hover:bg-[#fff5ec]"
               >
-                Check Another Copy
+                Check Again
               </Button>
             </div>
           )}
         </CardContent>
       </Card>
-      <div className="text-xs text-gray-500 max-w-lg mt-6 text-center">
-        <span>
-          <b>How this works:</b> This is a proof-of-concept. Paste your copy, run a check, and see highlights indicating potential legal, clarity, or target-audience issues.
-          <br />
-          <b>Why it matters:</b> Early QA in your content pipeline catches issues before legal—speeding review cycles and boosting team confidence.
+      <div className="text-xs text-[#ff671b] max-w-lg mt-8 text-center">
+        <b>How this demo works:</b> Compliance risks (legal, clarity, target) are highlighted on sample copy. <br />
+        <span className="text-gray-600">
+          Orange = legal risk; Yellow = clarity warning; Hover for explanation.
         </span>
+        <div className="mt-6 flex items-center justify-center">
+          <img
+            src="/lovable-uploads/85b0e3ba-813f-4d05-926c-6b58bd05ba15.png"
+            alt="Zoetis brand animal images"
+            className="rounded-full shadow w-28 h-28 object-cover border-4 border-[#ff671b] mx-2"
+          />
+          <img
+            src="/lovable-uploads/e89bafd6-9317-4969-bb38-6d27ca888c8b.png"
+            alt="Zoetis News Conference"
+            className="rounded-lg shadow w-44 h-28 object-cover mx-2"
+          />
+        </div>
       </div>
     </div>
   );
 }
 
 export default ComplianceDashboard;
+
