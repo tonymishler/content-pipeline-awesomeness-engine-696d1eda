@@ -1,34 +1,34 @@
 
 import React, { useState, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import ComplianceCopyCard from "./ComplianceCopyCard";
+import ComplianceCopyForm from "./ComplianceCopyForm";
 import ComplianceLoading from "./ComplianceLoading";
 import ComplianceResult from "./ComplianceResult";
 import { getRandomWaitMessage, PRESET_COPY, ISSUES } from "@/constants/compliance";
 import { annotateCopy } from "@/utils/annotateCopy";
 
-// Find which issues are present
-function getFoundIssues() {
+// Find which issues are present in the current copy
+function getFoundIssues(copy: string) {
   return ISSUES.filter((i) =>
-    PRESET_COPY.toLowerCase().includes(i.phrase.toLowerCase())
+    copy.toLowerCase().includes(i.phrase.toLowerCase())
   );
 }
 
 export function ComplianceDashboard() {
   const [step, setStep] = useState<"input" | "loading" | "result">("input");
   const [waitMsg, setWaitMsg] = useState(getRandomWaitMessage());
+  const [copy, setCopy] = useState(PRESET_COPY.trim());
   const [result, setResult] = useState<React.ReactNode[] | null>(null);
   const timeoutRef = useRef<number | null>(null);
 
   function handleRunCheck() {
     setWaitMsg(getRandomWaitMessage());
     setStep("loading");
-    // Simulate compliance check
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
     timeoutRef.current = window.setTimeout(() => {
-      setResult(annotateCopy(PRESET_COPY.trim()));
+      setResult(annotateCopy(copy));
       setStep("result");
-    }, 1800 + Math.random() * 700); // 1.8-2.5s
+    }, 1800 + Math.random() * 700);
   }
 
   function handleReset() {
@@ -36,7 +36,7 @@ export function ComplianceDashboard() {
     setStep("input");
   }
 
-  const foundIssues = getFoundIssues();
+  const foundIssues = getFoundIssues(copy);
 
   return (
     <div
@@ -53,13 +53,18 @@ export function ComplianceDashboard() {
               Compliance POC Demo
             </span>
             <span className="text-base text-gray-600">
-              Sample Zoetis copy, highlighting flagged compliance risks.
+              Paste or write Librela website copy below. Compliance risks will be highlighted.
             </span>
           </CardTitle>
         </CardHeader>
         <CardContent>
           {step === "input" && (
-            <ComplianceCopyCard onRunCheck={handleRunCheck} />
+            <ComplianceCopyForm
+              value={copy}
+              onChange={setCopy}
+              onRunCheck={handleRunCheck}
+              disabled={step === "loading"}
+            />
           )}
           {step === "loading" && (
             <ComplianceLoading waitMsg={waitMsg} />
@@ -96,3 +101,4 @@ export function ComplianceDashboard() {
 }
 
 export default ComplianceDashboard;
+
