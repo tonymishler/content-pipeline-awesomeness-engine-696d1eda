@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -23,26 +22,21 @@ const ComplianceCopyForm: React.FC<Props> = ({ value, onChange, onRunCheck, disa
       <div
         className="w-full max-w-prose flex flex-col"
         style={{
-          background: "#ffe8d4",
+          background: "#fff",
           borderRadius: "0.75rem",
           boxShadow: "0 0.5rem 1.5rem 0 rgba(0,0,0,0.05)",
+          border: '1.5px solid #ff671b',
         }}
       >
         <label
           htmlFor="copy"
-          className="sr-only"
+          className="text-base font-semibold px-4 pt-4 pb-1 text-gray-600"
         >
-          Librela Website Copy
+          Copy to Check
         </label>
         <Textarea
           id="copy"
-          className="w-full bg-transparent border-0 focus:ring-0 font-medium text-base resize-none text-[#403E43] px-4 py-4 rounded-t-lg min-h-[270px] max-h-[320px] overflow-y-auto"
-          style={{
-            maxHeight: 320,
-            minHeight: 200,
-            color: "#403E43",
-            fontFamily: "Montserrat, Arial, Helvetica, sans-serif"
-          }}
+          className="resize-vertical w-full min-h-[180px] max-h-[600px] text-lg bg-transparent border-none focus:ring-0 focus:outline-none shadow-none placeholder:text-gray-300"
           value={value}
           onChange={e => onChange(e.target.value)}
           placeholder="Paste or write your Librela copy here…"
@@ -67,4 +61,3 @@ const ComplianceCopyForm: React.FC<Props> = ({ value, onChange, onRunCheck, disa
 };
 
 export default ComplianceCopyForm;
-
