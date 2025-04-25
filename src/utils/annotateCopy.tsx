@@ -1,17 +1,17 @@
 import React from "react";
-import { ISSUES } from "@/constants/compliance";
-import { AlertTriangle, Info } from "lucide-react";
+import { ComplianceIssue } from "@/utils/ComplianceService";
 
 // Find phrases in preset copy and highlight them
 export function annotateCopy(
   text: string, 
-  onSelectIssue?: (issue: typeof ISSUES[0], idx: number) => void, 
-  selectedIdx?: number | null
+  onSelectIssue?: (issue: ComplianceIssue, idx: number) => void, 
+  selectedIdx?: number | null,
+  issues: ComplianceIssue[] = []
 ) {
   const out: React.ReactNode[] = [];
   
-  // Get the foundIssues in order they appear in ISSUES
-  const foundIssues = ISSUES.filter(issue => 
+  // Get the foundIssues in order they appear in issues
+  const foundIssues = issues.filter(issue => 
     text.toLowerCase().includes(issue.phrase.toLowerCase())
   );
   
@@ -19,7 +19,7 @@ export function annotateCopy(
   type Match = { 
     start: number; 
     length: number; 
-    issue: typeof ISSUES[0]; 
+    issue: ComplianceIssue; 
     foundIdx: number;
   };
   
