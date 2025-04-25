@@ -1,15 +1,16 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ComplianceCopyForm from "./ComplianceCopyForm";
 import ComplianceLoading from "./ComplianceLoading";
 import ComplianceResult from "./ComplianceResult";
 import ComplianceDetailsPanel, { ComplianceIssue } from "./ComplianceDetailsPanel";
-import { getRandomWaitMessage, PRESET_COPY, ISSUES } from "@/constants/compliance";
+import { getRandomWaitMessage, PRESET_COPY } from "@/constants/compliance";
 import { annotateCopy } from "@/utils/annotateCopy";
+import { useComplianceAnalysis } from "@/hooks/useComplianceAnalysis";
 
 // Find which issues are present in the current copy
-function getFoundIssues(copy: string) {
-  return ISSUES.filter((i) =>
+function getFoundIssues(copy: string, issues: ComplianceIssue[]) {
+  return issues.filter((i) =>
     copy.toLowerCase().includes(i.phrase.toLowerCase())
   );
 }
@@ -21,13 +22,28 @@ export function ComplianceDashboard() {
   const [result, setResult] = useState<React.ReactNode[] | null>(null);
   const [selectedIssueIdx, setSelectedIssueIdx] = useState<number | null>(null);
   const timeoutRef = useRef<number | null>(null);
+  
+  // Use our custom hook for compliance analysis
+  const { analyzeContent, isLoading, error, issues } = useComplianceAnalysis();
+
+  // Update the result when issues change
+  useEffect(() => {
+    if (step === "result" && issues.length > 0) {
+      setResult(annotateCopy(copy, (issue, idx) => handleHighlightClick(issue), selectedIssueIdx, issues));
+    }
+  }, [issues, copy, step, selectedIssueIdx]);
 
   function handleRunCheck() {
     setWaitMsg(getRandomWaitMessage());
     setStep("loading");
+    
+    // Call the API to analyze the content
+    analyzeContent(copy);
+    
+    // Set a timeout to simulate the API call (for demo purposes)
+    // In a real app, you would remove this and rely on the isLoading state
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
     timeoutRef.current = window.setTimeout(() => {
-      setResult(annotateCopy(copy));
       setStep("result");
     }, 1800 + Math.random() * 700);
   }
@@ -37,7 +53,7 @@ export function ComplianceDashboard() {
     setStep("input");
   }
 
-  const foundIssues = getFoundIssues(copy);
+  const foundIssues = getFoundIssues(copy, issues);
   const selectedIssue =
     selectedIssueIdx !== null && foundIssues[selectedIssueIdx]
       ? foundIssues[selectedIssueIdx]
@@ -89,19 +105,25 @@ export function ComplianceDashboard() {
                 value={copy}
                 onChange={setCopy}
                 onRunCheck={handleRunCheck}
-                disabled={step === "loading"}
+                disabled={isLoading}
               />
             )}
             {step === "loading" && (
               <ComplianceLoading waitMsg={waitMsg} />
             )}
-            {step === "result" && (
+            {step === "result" && result && (
               <ComplianceResult
                 foundIssues={foundIssues}
-                result={annotateCopy(copy, (issue, idx) => handleHighlightClick(issue), selectedIssueIdx)}
+                result={result}
                 onReset={handleReset}
                 selectedIssueIdx={selectedIssueIdx ?? undefined}
               />
+            )}
+            {error && (
+              <div className="mt-4 p-4 bg-red-50 text-red-700 rounded-md">
+                <p className="font-semibold">Error:</p>
+                <p>{error}</p>
+              </div>
             )}
           </CardContent>
         </Card>
