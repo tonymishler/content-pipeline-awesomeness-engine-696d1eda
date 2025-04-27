@@ -1,4 +1,3 @@
-
 import React from "react";
 
 type Props = {
@@ -10,7 +9,7 @@ const ComplianceLoading: React.FC<Props> = ({ waitMsg }) => {
     <div className="flex flex-col items-center justify-center min-h-[180px] py-10 animate-fade-in">
       <svg
         className="animate-spin mb-4"
-        style={{ color: "#ff671b" }}
+        style={{ color: "#3b82f6" }}
         width="40"
         height="40"
         viewBox="0 0 50 50"
@@ -33,7 +32,7 @@ const ComplianceLoading: React.FC<Props> = ({ waitMsg }) => {
           className="opacity-80"
         />
       </svg>
-      <span className="font-semibold text-[#ff671b] text-lg">{waitMsg}</span>
+      <span className="font-semibold text-blue-500 text-lg">{waitMsg}</span>
     </div>
   );
 };

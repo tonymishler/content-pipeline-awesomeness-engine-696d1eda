@@ -81,7 +81,7 @@ export function ComplianceDashboard() {
 
   return (
     <div
-      className="min-h-screen bg-white flex flex-col md:flex-row items-center justify-center py-12 w-full animate-fade-in"
+      className="min-h-screen bg-gray-100 flex flex-col md:flex-row items-center justify-center py-12 w-full animate-fade-in"
       style={{ fontFamily: "Montserrat, Arial, Helvetica, sans-serif" }}
     >
       <div className="flex flex-col items-center w-full max-w-2xl md:sticky md:top-8">
@@ -90,9 +90,9 @@ export function ComplianceDashboard() {
             <CardTitle className="flex flex-col items-center gap-2">
               <span
                 className="text-[2.2rem] font-extrabold"
-                style={{ color: "#ff671b", letterSpacing: 0.5 }}
+                style={{ color: "#3b82f6", letterSpacing: 0.5 }}
               >
-                PetRx Compliance
+                ComplyIQ
               </span>
               <span className="text-base text-gray-600">
                 Paste or write copy below. Compliance risks will be highlighted.
@@ -127,33 +127,35 @@ export function ComplianceDashboard() {
             )}
           </CardContent>
         </Card>
-        <div className="text-xs text-[#ff671b] max-w-lg mt-8 text-center">
-          <b>How this demo works:</b> Compliance risks (legal, clarity, target) are highlighted on sample copy. <br />
-          <span className="text-gray-600">
-            Orange = legal risk; Yellow = clarity warning; Click a highlight for explanation.
-          </span>
-          <div className="mt-6 flex items-center justify-center">
-            <img
-              src="/image1.png"
-              alt="Zoetis brand animal images"
-              className="rounded-full shadow w-28 h-28 object-cover border-4 border-[#ff671b] mx-2"
-            />
-            <img
-              src="/image2.png"
-              alt="Zoetis News Conference"
-              className="rounded-lg shadow w-44 h-28 object-cover mx-2"
-            />
-          </div>
-        </div>
       </div>
+
       {step === "result" && (
-        <ComplianceDetailsPanel
-          issue={selectedIssue}
-          onPrev={handlePrevIssue}
-          onNext={handleNextIssue}
-          hasPrev={selectedIssueIdx !== null && selectedIssueIdx > 0}
-          hasNext={selectedIssueIdx !== null && selectedIssueIdx < foundIssues.length - 1}
-        />
+        <div className="md:ml-8 flex flex-col">
+          <div className="text-sm mb-4">
+            <div className="text-blue-500 font-semibold mb-2">How this demo works:</div>
+            <div className="text-gray-700 mb-2">
+              Compliance risks (legal, clarity, target) are highlighted on sample copy.
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 bg-blue-500 rounded"></div>
+                <span className="text-gray-600">Legal risk</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 bg-yellow-200 rounded"></div>
+                <span className="text-gray-600">Clarity warning</span>
+              </div>
+            </div>
+            <div className="text-gray-600 mt-2">Click a highlight for explanation.</div>
+          </div>
+          <ComplianceDetailsPanel
+            issue={selectedIssue}
+            onPrev={handlePrevIssue}
+            onNext={handleNextIssue}
+            hasPrev={selectedIssueIdx !== null && selectedIssueIdx > 0}
+            hasNext={selectedIssueIdx !== null && selectedIssueIdx < foundIssues.length - 1}
+          />
+        </div>
       )}
     </div>
   );
