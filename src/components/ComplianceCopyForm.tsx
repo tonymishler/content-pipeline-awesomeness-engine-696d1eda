@@ -25,7 +25,7 @@ const ComplianceCopyForm: React.FC<Props> = ({ value, onChange, onRunCheck, disa
           background: "#fff",
           borderRadius: "0.75rem",
           boxShadow: "0 0.5rem 1.5rem 0 rgba(0,0,0,0.05)",
-          border: '1.5px solid #ff671b',
+          border: '1.5px solid #3b82f6',
         }}
       >
         <label
@@ -46,7 +46,7 @@ const ComplianceCopyForm: React.FC<Props> = ({ value, onChange, onRunCheck, disa
       <Button
         type="submit"
         size="lg"
-        className="w-full max-w-xs bg-[#ff671b] text-white rounded-md text-base hover:bg-[#da5900] transition"
+        className="w-full max-w-xs bg-blue-500 text-white rounded-md text-base hover:bg-blue-600 transition"
         disabled={disabled}
       >
         Run Compliance Check

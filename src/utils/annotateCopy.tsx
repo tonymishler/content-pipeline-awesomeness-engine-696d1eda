@@ -59,11 +59,11 @@ export function annotateCopy(
           id: `highlight-${match.foundIdx}`,
           className: `inline-flex items-center group relative px-1 rounded font-semibold cursor-pointer transition ` +
             (match.issue.type === "legal"
-              ? "bg-[#ffe8d4] text-[#ff671b] hover:bg-[#ffc099]"
+              ? "bg-blue-50 text-blue-500 hover:bg-blue-100"
               : match.issue.type === "clarity"
               ? "bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
               : "bg-blue-100 text-blue-700 hover:bg-blue-200") +
-            (selectedIdx === match.foundIdx ? ' ring-2 ring-[#ff671b] ring-offset-2' : ''),
+            (selectedIdx === match.foundIdx ? ' ring-2 ring-blue-500 ring-offset-2' : ''),
           onClick: () => onSelectIssue && onSelectIssue(match.issue, match.foundIdx),
           style: { 
             padding: '2px 0'
