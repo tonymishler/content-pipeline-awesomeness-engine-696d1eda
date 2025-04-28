@@ -21,7 +21,6 @@ export function ComplianceDashboard() {
   const [copy, setCopy] = useState(PRESET_COPY.trim());
   const [result, setResult] = useState<React.ReactNode[] | null>(null);
   const [selectedIssueIdx, setSelectedIssueIdx] = useState<number | null>(null);
-  const timeoutRef = useRef<number | null>(null);
   
   // Use our custom hook for compliance analysis
   const { analyzeContent, isLoading, error, issues } = useComplianceAnalysis();
@@ -33,19 +32,20 @@ export function ComplianceDashboard() {
     }
   }, [issues, copy, step, selectedIssueIdx]);
 
+  useEffect(() => {
+    if (step === "loading" && !isLoading) {
+      setStep("result");
+    }
+  }, [isLoading, step]);
+
   function handleRunCheck() {
     setWaitMsg(getRandomWaitMessage());
     setStep("loading");
     
     // Call the API to analyze the content
-    analyzeContent(copy);
-    
-    // Set a timeout to simulate the API call (for demo purposes)
-    // In a real app, you would remove this and rely on the isLoading state
-    if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    timeoutRef.current = window.setTimeout(() => {
+    analyzeContent(copy).then(() => {
       setStep("result");
-    }, 1800 + Math.random() * 700);
+    });
   }
 
   function handleReset() {
@@ -148,13 +148,15 @@ export function ComplianceDashboard() {
             </div>
             <div className="text-gray-600 mt-2">Click a highlight for explanation.</div>
           </div>
-          <ComplianceDetailsPanel
-            issue={selectedIssue}
-            onPrev={handlePrevIssue}
-            onNext={handleNextIssue}
-            hasPrev={selectedIssueIdx !== null && selectedIssueIdx > 0}
-            hasNext={selectedIssueIdx !== null && selectedIssueIdx < foundIssues.length - 1}
-          />
+          {selectedIssue !== null && selectedIssue.message !== "" && (
+            <ComplianceDetailsPanel
+              issue={selectedIssue}
+              onPrev={handlePrevIssue}
+              onNext={handleNextIssue}
+              hasPrev={selectedIssueIdx !== null && selectedIssueIdx > 0}
+              hasNext={selectedIssueIdx !== null && selectedIssueIdx < foundIssues.length - 1}
+            />
+          )}
         </div>
       )}
     </div>
